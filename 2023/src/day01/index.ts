@@ -4,7 +4,7 @@ const parseInput = (rawInput: string) => rawInput;
 
 const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
-  
+
   return;
 };
 
