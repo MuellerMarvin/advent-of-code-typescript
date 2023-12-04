@@ -23,10 +23,23 @@ const part1 = (rawInput: string) => {
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
   const cardPairs = cardPairifier(input);
+  let pairCount: number[] = new Array(cardPairs.length).fill(1);
 
-  // TODO: Part 2
+  cardPairs.forEach((pair, index) => {
+    // Which numbers win ?
+    let filtered = pair[0].filter((element) => {
+      return pair[1].includes(element);
+    });
 
-  return;
+    let subset = pairCount.slice(index + 1, index + 1 + filtered.length);
+    subset = subset.map((item) => item + pairCount[index]);
+
+    pairCount.splice(index + 1, subset.length, ...subset);
+  });
+
+  return pairCount.reduce((acc, value) => {
+    return acc + value;
+  }, 0);
 };
 
 const cardPairifier = (input: string): number[][][] => {
