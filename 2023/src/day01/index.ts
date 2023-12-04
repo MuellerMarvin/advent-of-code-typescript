@@ -23,9 +23,9 @@ const part2 = (rawInput: string) => {
 
   let pattern: RegExp = /\d|one|two|three|four|five|six|seven|eight|nine/g;
   const numbers: number[] = lines.map((line) => {
-    let matches: string[] = line.match(pattern);
-    let digits: number[] = matches.map((digit) => parseDigit(digit));
-    return digits[0] * 10 + digits[digits.length - 1];
+    const digits: number[] = line.match(pattern).map((digit) => parseDigit(digit));
+    const digiSum: number = digits[0] * 10 + digits[digits.length - 1];
+    return digiSum;
   });
 
   return numbers.reduce((acc, value) => {
