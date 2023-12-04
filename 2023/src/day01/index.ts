@@ -3,6 +3,7 @@ import run from "aocrunner";
 const parseInput = (rawInput: string) => rawInput;
 
 const part1 = (rawInput: string) => {
+  return;
   const input = parseInput(rawInput);
   const lines: String[] = input.split("\n");
 
@@ -21,9 +22,13 @@ const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
   const lines: String[] = input.split("\n");
 
-  let pattern: RegExp = /\d|one|two|three|four|five|six|seven|eight|nine/g;
+  let pattern: RegExp =
+    /\d|oneight|twone|threeight|fiveight|sevenine|eightwo|eighthree|nineight|one|two|three|four|five|six|seven|eight|nine/g;
   const numbers: number[] = lines.map((line) => {
-    const digits: number[] = line.match(pattern).map((digit) => parseDigit(digit));
+    const digits: number[] = line
+      .match(pattern)
+      .map((digit) => parseDigit(digit))
+      .flat();
     const digiSum: number = digits[0] * 10 + digits[digits.length - 1];
     return digiSum;
   });
@@ -33,7 +38,7 @@ const part2 = (rawInput: string) => {
   }, 0);
 };
 
-const parseDigit = (digit: string): number => {
+const parseDigit = (digit: string): number | number[] => {
   switch (digit) {
     case "one":
       return 1;
@@ -53,11 +58,25 @@ const parseDigit = (digit: string): number => {
       return 8;
     case "nine":
       return 9;
+    case "oneight":
+      return [1, 8];
+    case "twone":
+      return [2, 1];
+    case "threeight":
+      return [3, 8];
+    case "fiveight":
+      return [5, 8];
+    case "sevenine":
+      return [7, 9];
+    case "eightwo":
+      return [8, 2];
+    case "eighthree":
+      return [8, 3];
+    case "nineight":
+      return [9, 8];
     default:
       return parseInt(digit);
   }
-
-  return 0;
 };
 
 run({
