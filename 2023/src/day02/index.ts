@@ -26,8 +26,17 @@ const part1 = (rawInput: string) => {
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
+  const games = getGames(input);
+  const minimums = games.map((game) => {
+    return findMinimumCubes(game);
+  });
+  const powers = minimums.map((values) => {
+    return values[0] * values[1] * values[2];
+  });
 
-  return;
+  return powers.reduce((acc, value) => {
+    return acc + value;
+  }, 0)
 };
 
 const getGames = (input: string) => {
@@ -56,6 +65,18 @@ const colorDict: { [colorname: string]: number } = {
 
 const verifySet = (set: number[], maximums: number[]): boolean => {
   return set.every((value, index) => (value <= maximums[index]));
+}
+
+const findMinimumCubes = (game: number[][]): number[] => {
+  let minimum = [0, 0, 0];
+  game.forEach((set) => {
+    set.forEach((value, index) => {
+      if(minimum[index] < value) {
+        minimum[index] = value;
+      }
+    });
+  });
+  return minimum;
 }
 
 run({
