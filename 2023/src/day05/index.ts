@@ -41,8 +41,6 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
 
-  const seeds 
-
   return;
 };
 
