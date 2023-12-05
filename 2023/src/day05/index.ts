@@ -1,39 +1,102 @@
 import run from "aocrunner";
 
-const parseInput = (rawInput: string): { seeds: number[], convTables: number[][][] } => {
-  let lines = rawInput.split('\n');
+const parseInput = (
+  rawInput: string,
+): { seeds: number[]; convTables: number[][][] } => {
+  let lines = rawInput.split("\n");
 
   // Seeds
-  const seeds = lines[0].split(' ').splice(1).map((stringId: string) => {
-    return parseInt(stringId);
-  });
+  const seeds = lines[0]
+    .split(" ")
+    .splice(1)
+    .map((stringId: string) => {
+      return parseInt(stringId);
+    });
 
   // Extract sections of tables
-  const sections = lines.slice(2).join('\n').split('\n\n').map((section=> {
-    return section.split(':\n')[1];
-  }));
+  const sections = lines
+    .slice(2)
+    .join("\n")
+    .split("\n\n")
+    .map((section) => {
+      return section.split(":\n")[1];
+    });
 
   // Conversion Tables
   const convTables = sections.map((section) => {
-    return section.split('\n').map((item) => item.split(' ').map((numString) => parseInt(numString)));
-  })
+    return section
+      .split("\n")
+      .map((item) => item.split(" ").map((numString) => parseInt(numString)));
+  });
 
-  return { seeds, convTables }
+  return { seeds, convTables };
 };
 
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
-
-
-
-  return;
-};
+  const seedConfigs: number[][] = getSeedConfigs(input.seeds, input.convTables);
+  return findLowestLocation(seedConfigs);
+}
 
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
 
+  const seeds 
+
   return;
 };
+
+const getSeedConfigs = (seeds: number[], convTables: number[][][]) => {
+  const seedConfigs = seeds.map((seed) => {
+    let output = [];
+    let lastValue = seed;
+    convTables.forEach((table, index) => {
+      lastValue = runConversion(lastValue, table);
+      output.push(lastValue);
+    });
+    return output;
+  });
+  return seedConfigs;
+}
+
+const isInSourceRange = (value: number, table: number[]): boolean => {
+  return value >= table[1] && value < table[1] + table[2];
+};
+
+const runConversion = (source: number, convTables: number[][]): number => {
+  let table = convTables.find((table) => isInSourceRange(source, table));
+
+  // if no table matches, it matches directly
+  if (table == undefined) {
+    return source;
+  }
+
+  let src = table[1];
+  let dst = table[0];
+
+  if (dst > src) {
+    let diff = dst - src;
+    return source + diff;
+  }
+  // src > dst
+  else if (src > dst) {
+    let diff = src - dst;
+    return source - diff;
+  }
+  // equal
+  else {
+    return src;
+  }
+};
+
+const findLowestLocation = (seedConfigs: number[][]): number => {
+  let lowest = Number.MAX_VALUE;
+  seedConfigs.forEach((value) => {
+    let location = value[value.length - 1];
+    if (location < lowest) lowest = location;
+  });
+  return lowest;
+}
 
 run({
   part1: {
