@@ -36,16 +36,40 @@ const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
   const seedConfigs: number[][] = getSeedConfigs(input.seeds, input.convTables);
   return findLowestLocation(seedConfigs);
-}
+};
 
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
+  let seedConfigs = [];
 
-  return;
+  let starts = [];
+  let lengths = [];
+  input.seeds.forEach((value, index) => {
+    if(index % 2 == 0) {
+      starts.push(value);
+    }
+    else {
+      lengths.push(value);
+    }
+  });
+
+  starts.map((start, index) => {
+    let length = lengths[index];
+    for (let i = start; i < (start + length); i++) {
+      seedConfigs.push(getSeedConfig(i, input.convTables));
+    }
+  })
+
+
+  return findLowestLocation(seedConfigs);
 };
 
 const getSeedConfigs = (seeds: number[], convTables: number[][][]) => {
-  const seedConfigs = seeds.map((seed) => {
+  const seedConfigs = seeds.map((seed) => getSeedConfig(seed, convTables));
+  return seedConfigs;
+};
+
+const getSeedConfig = (seed: number, convTables: number[][][]) => {
     let output = [];
     let lastValue = seed;
     convTables.forEach((table, index) => {
@@ -53,8 +77,6 @@ const getSeedConfigs = (seeds: number[], convTables: number[][][]) => {
       output.push(lastValue);
     });
     return output;
-  });
-  return seedConfigs;
 }
 
 const isInSourceRange = (value: number, table: number[]): boolean => {
@@ -94,7 +116,7 @@ const findLowestLocation = (seedConfigs: number[][]): number => {
     if (location < lowest) lowest = location;
   });
   return lowest;
-}
+};
 
 run({
   part1: {
