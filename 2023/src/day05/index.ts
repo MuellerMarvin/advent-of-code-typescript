@@ -55,7 +55,7 @@ const part2 = (rawInput: string): any => {
   starts.forEach((start, index) => {
     let length = lengths[index];
     for (let i = start; i < start + length; i++) {
-      let location = getSeedConfig(i, input.convTables)[6];
+      let location = (getSeedConfig(i, input.convTables))[6];
 
       if (location < closest) {
         closest = location;
@@ -71,7 +71,7 @@ const getSeedConfigs = (seeds: number[], convTables: number[][][]) => {
   return seedConfigs;
 };
 
-const getSeedConfig = (seed: number, convTables: number[][][]) => {
+const getSeedConfig = (seed: number, convTables: number[][][]): number[] => {
   let output = [];
   let lastValue = seed;
   convTables.forEach((table, index) => {
