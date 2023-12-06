@@ -40,28 +40,30 @@ const part1 = (rawInput: string): any => {
 
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
-  let seedConfigs = [];
 
   let starts = [];
   let lengths = [];
   input.seeds.forEach((value, index) => {
-    if(index % 2 == 0) {
+    if (index % 2 == 0) {
       starts.push(value);
-    }
-    else {
+    } else {
       lengths.push(value);
     }
   });
 
-  starts.map((start, index) => {
+  let closest = getSeedConfig(starts[0], input.convTables)[6];
+  starts.forEach((start, index) => {
     let length = lengths[index];
-    for (let i = start; i < (start + length); i++) {
-      seedConfigs.push(getSeedConfig(i, input.convTables));
+    for (let i = start; i < start + length; i++) {
+      let location = getSeedConfig(i, input.convTables)[6];
+
+      if (location < closest) {
+        closest = location;
+      }
     }
-  })
+  });
 
-
-  return findLowestLocation(seedConfigs);
+  return closest;
 };
 
 const getSeedConfigs = (seeds: number[], convTables: number[][][]) => {
@@ -70,14 +72,14 @@ const getSeedConfigs = (seeds: number[], convTables: number[][][]) => {
 };
 
 const getSeedConfig = (seed: number, convTables: number[][][]) => {
-    let output = [];
-    let lastValue = seed;
-    convTables.forEach((table, index) => {
-      lastValue = runConversion(lastValue, table);
-      output.push(lastValue);
-    });
-    return output;
-}
+  let output = [];
+  let lastValue = seed;
+  convTables.forEach((table, index) => {
+    lastValue = runConversion(lastValue, table);
+    output.push(lastValue);
+  });
+  return output;
+};
 
 const isInSourceRange = (value: number, table: number[]): boolean => {
   return value >= table[1] && value < table[1] + table[2];
