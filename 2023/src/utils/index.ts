@@ -29,3 +29,16 @@
  *     import { myUtil } from '../utils'
  *
  */
+
+const getOccurences = <arrayType>(array: arrayType[]) => {
+  let occurences = new Map<arrayType, number>();
+  array.forEach((value) => {
+    if(occurences.has(value)) {
+      occurences.set(value, occurences.get(value) + 1)
+    }
+    else {
+      occurences.set(value, 1);
+    }
+  })
+  return occurences;
+}
