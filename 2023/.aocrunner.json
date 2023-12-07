@@ -104,13 +104,13 @@
           "9041484",
           "9760800"
         ],
-        "time": 0.259
+        "time": 0.2644
       },
       "part2": {
-        "solved": false,
-        "result": null,
+        "solved": true,
+        "result": "29891250",
         "attempts": [],
-        "time": null
+        "time": 35.1785
       }
     },
     {

@@ -26,7 +26,11 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
 
-  return;
+  const time = parseInt(input.times.join(''));
+  const distance = parseInt(input.distances.join(''));
+  const maxMin = getRaceMaxMin(time, distance);
+
+  return maxMin.max - maxMin.min;
 };
 
 const getRaceMaxMin = (
