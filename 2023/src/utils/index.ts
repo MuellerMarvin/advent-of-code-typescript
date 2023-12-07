@@ -30,7 +30,7 @@
  *
  */
 
-const getOccurences = <arrayType>(array: arrayType[]) => {
+export const getOccurences = <arrayType>(array: arrayType[]) => {
   let occurences = new Map<arrayType, number>();
   array.forEach((value) => {
     if (occurences.has(value)) {
