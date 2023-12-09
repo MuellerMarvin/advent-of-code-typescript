@@ -122,7 +122,7 @@
           "6632",
           "6440"
         ],
-        "time": 5.1156
+        "time": 4.7728
       },
       "part2": {
         "solved": false,
@@ -134,21 +134,23 @@
           "251004838",
           "251302844"
         ],
-        "time": 3.4433
+        "time": 40.5614
       }
     },
     {
       "part1": {
-        "solved": false,
-        "result": null,
+        "solved": true,
+        "result": "19099",
         "attempts": [],
-        "time": null
+        "time": 43.1036
       },
       "part2": {
-        "solved": false,
-        "result": null,
-        "attempts": [],
-        "time": null
+        "solved": true,
+        "result": "17099847107071",
+        "attempts": [
+          "269"
+        ],
+        "time": 158.4933
       }
     },
     {

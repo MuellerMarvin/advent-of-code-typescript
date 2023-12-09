@@ -41,3 +41,10 @@ export const getOccurences = <arrayType>(array: arrayType[]) => {
   });
   return occurences;
 };
+
+export const removeStr = (input: string, remove: string[]): string => {
+  remove.forEach((value) => {
+    input = input.replace(value, '');
+  });
+  return input;
+}
