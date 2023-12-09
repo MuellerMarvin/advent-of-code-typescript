@@ -70,15 +70,13 @@ const sortHandsForValue = (pairs: hand[], joker: boolean) => {
 };
 
 const battleSets = (setA: number[], setB: number[], joker: boolean) => {
+  // If the joker is active, the card 11 is actually 1
+  if (joker) {
+    setA = setA.map((value) => (value == 11 ? 1 : 11));
+    setB = setB.map((value) => (value == 11 ? 1 : 11));
+  }
   for (let i: number = 0; i < setA.length; i++) {
     if (setA[i] != setB[i]) {
-      if(joker && setA[i] == 11)
-      {
-        return 1
-      }
-      if(joker && setB[i] == 11) {
-        return -1;
-      }
       return setA[i] - setB[i];
     }
   }
@@ -102,12 +100,62 @@ const getCardValue = (card: string): number => {
   }
 };
 
+function* jokerGen(length: number): Generator<number[], void, unknown> {
+  const array = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14];
+  let result = new Array(length).fill(0); // Initialize with indices of the first element
+
+  while (true) {
+    // Yield the current combination
+    yield result.map(i => array[i]);
+
+    // Find the rightmost element that can be incremented
+    let i = length - 1;
+    while (i >= 0 && result[i] === array.length - 1) {
+      i--;
+    }
+
+    // If all elements are at their maximum value, we're done
+    if (i < 0) return;
+
+    // Increment the current element and reset all elements to the right
+    result[i]++;
+    for (let j = i + 1; j < length; j++) {
+      result[j] = 0;
+    }
+  }
+}
+
+
 const getCardSetType = (cardSet: number[], joker: boolean): SetType => {
   const occurences = getOccurences(cardSet);
   const sortedValues = [...occurences.values()].sort((a, b) => b - a);
-  joker = (joker && occurences.has(11));
 
-  [...occurences.entries()].length
+  // Try joker combinations
+  if (joker && occurences.has(11)) {
+    let highestType = SetType.HighCard;
+    const gen = jokerGen(occurences.get(11));
+    let baseSet = cardSet.sort((a, b) => {
+      if (a == 11) {
+        return 1;
+      }
+      if (b == 11) {
+        return -1;
+      }
+      return 0;
+    }).slice(0, -occurences.get(11));
+
+    for (const genVal of gen) {
+      const tempSet = [...baseSet, ...genVal];
+      const tempType = getCardSetType(tempSet, false);
+      if(tempType > highestType) {
+        highestType = getCardSetType(tempSet, false);
+      }
+    }
+
+    return highestType;
+  }
+
+  [...occurences.entries()].length;
 
   // Five of a kind
   if (sortedValues.length == 1) {
@@ -116,19 +164,16 @@ const getCardSetType = (cardSet: number[], joker: boolean): SetType => {
 
   // Four of a kind
   if (sortedValues[0] == 4) {
-    if(joker) return SetType.FiveOfAKind;
     return SetType.FourOfAKind;
   }
 
   // Full House
   if (sortedValues.length == 2) {
-    if(joker) return SetType.FiveOfAKind;
     return SetType.FullHouse;
   }
 
   // Three of a kind
   if (sortedValues.length === 3 && sortedValues[0] == 3) {
-    if(joker) return SetType.FourOfAKind;
     return SetType.ThreeOfAKind;
   }
 
@@ -138,26 +183,15 @@ const getCardSetType = (cardSet: number[], joker: boolean): SetType => {
     sortedValues[0] === 2 &&
     sortedValues[1] === 2
   ) {
-    if(joker) {
-      if(occurences.get(11) == 1)
-      {
-        return SetType.ThreeOfAKind;
-      }
-      else {
-        return SetType.FourOfAKind;
-      }
-    }
     return SetType.TwoPair;
   }
 
   // One pair
   if (sortedValues.length == 4 && sortedValues[0] === 2) {
-    if(joker) return SetType.ThreeOfAKind;
     return SetType.OnePair;
   }
 
   // High card
-  if(joker) return SetType.OnePair;
   return SetType.HighCard;
 };
 
