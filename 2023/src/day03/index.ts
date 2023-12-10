@@ -80,8 +80,7 @@ const part2 = (rawInput: string): any => {
 
   const gears = input.gears.map((gear) => {
     gear.touches = input.numbers.filter((number, index) =>
-    gearAndNumberTouch(gear, number),
-  );
+      gearAndNumberTouch(gear, number));
     return gear;
   });
 
@@ -89,7 +88,7 @@ const part2 = (rawInput: string): any => {
 
   const ratios = doubleTouchers.map((gear) => {
     return gear.touches[0].number * gear.touches[1].number;
-  })
+  });
 
   return ratios.reduce((prev, val) => prev + val);
 };
@@ -102,7 +101,7 @@ const gearAndNumberTouch = (
   if (Math.abs(number.line - gear.line) < 2) {
     if (
       number.start >= gear.index - number.length &&
-      number.start < gear.index + 1
+      number.start <= gear.index + 1
     ) {
       return true;
     }
