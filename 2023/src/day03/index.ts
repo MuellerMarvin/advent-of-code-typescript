@@ -1,8 +1,6 @@
 import run from "aocrunner";
 
-const parseInput = (rawInput: string) => rawInput;
-
-const parseInputPart1 = (rawInput: string) => {
+const parseInput = (rawInput: string) => {
   let lines: string[] = rawInput.split("\n");
 
   // Scan lines for numbers
@@ -36,24 +34,35 @@ type NumberSignature = {
   start: number; // Start position in the line
 };
 
+type GearSignature = {
+  line: number;
+  index: number;
+};
+
+const getSpace = (
+  lines: string[],
+  lineIndex: number,
+  charIndex: number,
+  itemLength: number,
+) => {
+  let lineStart = Math.max(0, lineIndex - 1);
+  let lineEnd = Math.min(lines.length, lineIndex + 2);
+  let charStart = Math.max(0, charIndex - 1);
+  let charEnd = Math.min(lines[lineIndex].length, charIndex + itemLength + 1);
+
+  const space = lines.slice(lineStart, lineEnd).map((line) => {
+    return line.slice(charStart, charEnd);
+  });
+
+  return space;
+};
+
 const part1 = (rawInput: string): any => {
-  const input = parseInputPart1(rawInput);
+  const input = parseInput(rawInput);
   const machineNumbers: number[] = [];
 
   input.numbers.forEach((number) => {
-    let lineStart = Math.max(0, number.line - 1);
-    let lineEnd = Math.min(input.lines.length, number.line + 2);
-    let charStart = Math.max(0, number.start - 1);
-    let charEnd = Math.min(
-      input.lines[number.line].length,
-      number.start + number.length + 1,
-    );
-
-    const space = input.lines.slice(lineStart, lineEnd).map((line) => {
-      return line.slice(charStart, charEnd);
-    });
-
-    const text = space.join("");
+    const space = getSpace(input.lines, number.line, number.start, number.length);
 
     if (space.join("").match(/^[.\d]*$/) === null) {
       machineNumbers.push(number.number);
@@ -68,7 +77,7 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
 
-  
+
 
   return;
 };
