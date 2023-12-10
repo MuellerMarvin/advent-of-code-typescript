@@ -26,7 +26,7 @@ const parseInput = (rawInput: string) => {
 
   let gears: GearSignature[] = [];
   lines.forEach((line, lineIndex) => {
-    const matches = line.match(/[*]/);
+    const matches = line.match(/[*]/g);
 
     if (matches == null) return;
 
