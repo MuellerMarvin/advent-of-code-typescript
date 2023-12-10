@@ -1,11 +1,10 @@
 import run from "aocrunner";
-import { Dir } from "fs";
 
 enum Direction {
-  North = 1,
-  East = 2,
-  South = 3,
-  West = 4,
+  North,
+  East,
+  South,
+  West,
 }
 
 const pipeToArray: { [pipe: string]: Direction[] } = {
@@ -20,10 +19,10 @@ const pipeToArray: { [pipe: string]: Direction[] } = {
 };
 
 const directionToArray: { [direction in Direction]: number[] } = {
-  [Direction.North]: [-1, 0],
-  [Direction.East]: [0, 1],
-  [Direction.South]: [1, 0],
-  [Direction.West]: [0, -1],
+  [Direction.North]: [-1, 0].slice(0),
+  [Direction.East]: [0, 1].slice(0),
+  [Direction.South]: [1, 0].slice(0),
+  [Direction.West]: [0, -1].slice(0),
 };
 
 const directionInverse: { [direction in Direction]: Direction } = {
@@ -41,6 +40,20 @@ const parseInput = (rawInput: string) => {
 
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
+  const startPoint = input.startPoint;
+
+  // All possible directions from the start-point
+  const directions = [
+    Direction.North,
+    Direction.East,
+    Direction.South,
+    Direction.West,
+  ];
+
+  let loops = [];
+  directions.forEach((direction) => {
+    loops.push(getLoop(input.grid, startPoint, direction));
+  });
 
   return;
 };
@@ -51,15 +64,93 @@ const part2 = (rawInput: string): any => {
   return;
 };
 
-const getStartPoint = (grid: string[][]) => {
-  grid.forEach((line, lineIndex) => {
-    let indexFound = line.findIndex((value) => value == "S");
-    if (indexFound > -1) {
-      return [lineIndex, indexFound];
+const getLoop = (
+  grid: string[][],
+  startPoint: number[],
+  startDirection: Direction,
+): number[][] | null => {
+  let nowPoint = startPoint;
+  let nowDirection: Direction = startDirection;
+  let pastPoints: number[][] = [];
+
+  console.log("New Loop");
+
+  while (true) {
+    let next = getNext(grid, nowPoint, nowDirection);
+    console.log(next);
+    if (next == null) break;
+    nowPoint = next.nextPoint;
+    nowDirection = next.nextDirection;
+    pastPoints.push(next.nextPoint);
+  }
+
+  const endPipe = getPipe(grid, nowPoint);
+  if(endPipe == null) return null; // Failed to loop
+  if(endPipe == 'S') return pastPoints; // Loop complete !
+};
+
+const getStartPoint = (grid: string[][]): number[] | null => {
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if(grid[i][j] === "S") {
+        return [i, j];
+      }
     }
-  });
+  }
   return null;
 };
+
+const getPipe = (grid: string[][], pos: number[]): string | null => {
+  try {
+    return grid[pos[0]][pos[1]];
+  }
+  catch {
+    return null;
+  }
+};
+
+const getNext = (
+  grid: string[][],
+  nowPoint: number[],
+  nowDirection: Direction,
+): {
+  nextPoint: number[];
+  nextDirection: Direction;
+} | null => {
+  // Calculate next point after step
+  const nextPoint: number[] = nowPoint.map((value, index) => {
+    return value + directionToArray[nowDirection][index];
+  });
+  
+  // Verify new move
+  const isMoveLegal = moveLegal(grid, nextPoint, directionInverse[nowDirection]);
+  if(!isMoveLegal) {
+    return null;
+  }
+
+  console.log(nextPoint);
+
+  const pipe = ;
+
+  // Get the direction that is not the entry-direction from the pipe by filtering it's direction list
+  const nextDirection = pipeToArray[getPipe(grid, nowPoint)].filter((direction) => {
+    direction != directionInverse[nowDirection];
+  })[0];
+
+  return { nextPoint, nextDirection};
+};
+
+const moveLegal = (grid: string[][], nextPos: number[], entryDirection: Direction): boolean => {
+  // Checks if pipe is in grid
+  const pipe = getPipe(grid, nextPos);
+  if(pipe ==null) return false;
+
+  // Checks if direction is legal
+  const inverseDirection = directionInverse[entryDirection];
+  const pipeArray: Direction[] = pipeToArray[pipe];
+
+  return pipeArray.includes(inverseDirection);
+}
 
 run({
   part1: {
