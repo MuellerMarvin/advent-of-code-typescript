@@ -9,17 +9,22 @@ const parseInput = (rawInput: string) => {
     // Find numbers in line
     const matches = line.match(/\d+/g);
 
-    if(matches == null) return;
+    if (matches == null) return;
 
     // Find indices
     matches.forEach((match) => {
       let matchIndex = line.indexOf(match);
-      line = line.replace(match, '.'.repeat(match.length));
-      numberSignatures.push({ number: parseInt(match), length: match.length, line: lineIndex, start: matchIndex });
+      line = line.replace(match, ".".repeat(match.length));
+      numberSignatures.push({
+        number: parseInt(match),
+        length: match.length,
+        line: lineIndex,
+        start: matchIndex,
+      });
     });
   });
 
-  return { rawInput, lines, numbers: numberSignatures }
+  return { rawInput, lines, numbers: numberSignatures };
 };
 
 type NumberSignature = {
@@ -27,7 +32,7 @@ type NumberSignature = {
   length: number; // Length of the number in digits
   line: number; // Line index
   start: number; // Start position in the line
-}
+};
 
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
@@ -37,21 +42,24 @@ const part1 = (rawInput: string): any => {
     let lineStart = Math.max(0, number.line - 1);
     let lineEnd = Math.min(input.lines.length, number.line + 2);
     let charStart = Math.max(0, number.start - 1);
-    let charEnd = Math.min(input.lines[number.line].length, number.start + number.length + 1);
+    let charEnd = Math.min(
+      input.lines[number.line].length,
+      number.start + number.length + 1,
+    );
 
     const space = input.lines.slice(lineStart, lineEnd).map((line) => {
       return line.slice(charStart, charEnd);
     });
 
-    const text = space.join('');
+    const text = space.join("");
 
-    if(space.join('').match(/^[.\d]*$/) === null) {
+    if (space.join("").match(/^[.\d]*$/) === null) {
       machineNumbers.push(number.number);
     }
   });
 
   return machineNumbers.reduce((prev, val) => {
-    return prev + val
+    return prev + val;
   }, 0);
 };
 
