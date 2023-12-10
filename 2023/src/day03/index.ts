@@ -1,6 +1,8 @@
 import run from "aocrunner";
 
-const parseInput = (rawInput: string) => {
+const parseInput = (rawInput: string) => rawInput;
+
+const parseInputPart1 = (rawInput: string) => {
   let lines: string[] = rawInput.split("\n");
 
   // Scan lines for numbers
@@ -35,7 +37,7 @@ type NumberSignature = {
 };
 
 const part1 = (rawInput: string): any => {
-  const input = parseInput(rawInput);
+  const input = parseInputPart1(rawInput);
   const machineNumbers: number[] = [];
 
   input.numbers.forEach((number) => {
@@ -65,6 +67,8 @@ const part1 = (rawInput: string): any => {
 
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
+
+  
 
   return;
 };
