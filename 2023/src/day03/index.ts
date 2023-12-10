@@ -1,14 +1,58 @@
 import run from "aocrunner";
 
 const parseInput = (rawInput: string) => {
-  let lines: any = rawInput.split('\n');
-  lines = lines.map((line) => Array.from(line));
-  return lines;
+  let lines: string[] = rawInput.split("\n");
+
+  // Scan lines for numbers
+  let numberSignatures: NumberSignature[] = [];
+  lines.forEach((line, lineIndex) => {
+    // Find numbers in line
+    const matches = line.match(/\d+/g);
+
+    if(matches == null) return;
+
+    // Find indices
+    matches.forEach((match) => {
+      let matchIndex = line.indexOf(match);
+      line = line.replace(match, '.'.repeat(match.length));
+      numberSignatures.push({ number: parseInt(match), length: match.length, line: lineIndex, start: matchIndex });
+    });
+  });
+
+  return { rawInput, lines, numbers: numberSignatures }
 };
+
+type NumberSignature = {
+  number: number; // The number itself
+  length: number; // Length of the number in digits
+  line: number; // Line index
+  start: number; // Start position in the line
+}
 
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
-  return;
+  const machineNumbers: number[] = [];
+
+  input.numbers.forEach((number) => {
+    let lineStart = Math.max(0, number.line - 1);
+    let lineEnd = Math.min(input.lines.length, number.line + 2);
+    let charStart = Math.max(0, number.start - 1);
+    let charEnd = Math.min(input.lines[number.line].length, number.start + number.length + 1);
+
+    const space = input.lines.slice(lineStart, lineEnd).map((line) => {
+      return line.slice(charStart, charEnd);
+    });
+
+    const text = space.join('');
+
+    if(space.join('').match(/^[.\d]*$/) === null) {
+      machineNumbers.push(number.number);
+    }
+  });
+
+  return machineNumbers.reduce((prev, val) => {
+    return prev + val
+  }, 0);
 };
 
 const part2 = (rawInput: string): any => {
