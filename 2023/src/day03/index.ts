@@ -24,7 +24,20 @@ const parseInput = (rawInput: string) => {
     });
   });
 
-  return { rawInput, lines, numbers: numberSignatures };
+  let gears: GearSignature[] = [];
+  lines.forEach((line, lineIndex) => {
+    const matches = line.match(/[*]/);
+
+    if (matches == null) return;
+
+    matches.forEach((match) => {
+      let matchIndex = line.indexOf(match);
+      line = line.replace(match, ".");
+      gears.push({ line: lineIndex, index: matchIndex });
+    });
+  });
+
+  return { rawInput, lines, numbers: numberSignatures, gears };
 };
 
 type NumberSignature = {
@@ -37,6 +50,64 @@ type NumberSignature = {
 type GearSignature = {
   line: number;
   index: number;
+  touches?: NumberSignature[];
+};
+
+const part1 = (rawInput: string): any => {
+  const input = parseInput(rawInput);
+  const machineNumbers: number[] = [];
+
+  input.numbers.forEach((number) => {
+    const space = getSpace(
+      input.lines,
+      number.line,
+      number.start,
+      number.length,
+    );
+
+    if (space.join("").match(/^[.\d]*$/) === null) {
+      machineNumbers.push(number.number);
+    }
+  });
+
+  return machineNumbers.reduce((prev, val) => {
+    return prev + val;
+  }, 0);
+};
+
+const part2 = (rawInput: string): any => {
+  const input = parseInput(rawInput);
+
+  const gears = input.gears.map((gear) => {
+    gear.touches = input.numbers.filter((number, index) =>
+    gearAndNumberTouch(gear, number),
+  );
+    return gear;
+  });
+
+  const doubleTouchers = gears.filter((gear) => gear.touches.length == 2);
+
+  const ratios = doubleTouchers.map((gear) => {
+    return gear.touches[0].number * gear.touches[1].number;
+  })
+
+  return ratios.reduce((prev, val) => prev + val);
+};
+
+const gearAndNumberTouch = (
+  gear: GearSignature,
+  number: NumberSignature,
+): boolean => {
+  // Close enough line-wise ?
+  if (Math.abs(number.line - gear.line) < 2) {
+    if (
+      number.start >= gear.index - number.length &&
+      number.start < gear.index + 1
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const getSpace = (
@@ -55,31 +126,6 @@ const getSpace = (
   });
 
   return space;
-};
-
-const part1 = (rawInput: string): any => {
-  const input = parseInput(rawInput);
-  const machineNumbers: number[] = [];
-
-  input.numbers.forEach((number) => {
-    const space = getSpace(input.lines, number.line, number.start, number.length);
-
-    if (space.join("").match(/^[.\d]*$/) === null) {
-      machineNumbers.push(number.number);
-    }
-  });
-
-  return machineNumbers.reduce((prev, val) => {
-    return prev + val;
-  }, 0);
-};
-
-const part2 = (rawInput: string): any => {
-  const input = parseInput(rawInput);
-
-
-
-  return;
 };
 
 // getIfNumberHasSymbolsAroundit()

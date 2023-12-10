@@ -49,13 +49,15 @@
           "532718",
           "187"
         ],
-        "time": 3.0815
+        "time": 2.1177
       },
       "part2": {
         "solved": false,
-        "result": null,
-        "attempts": [],
-        "time": null
+        "result": "15914333",
+        "attempts": [
+          "15914333"
+        ],
+        "time": 2.7485
       }
     },
     {
