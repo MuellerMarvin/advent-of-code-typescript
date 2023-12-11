@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { stat } from "fs";
 
 enum Direction {
   North = 0,
@@ -67,45 +68,69 @@ const part2 = (rawInput: string): any => {
   let grid = parseInput(rawInput).grid;
   const startPoint = getStartPoint(grid);
 
-  grid = getMarkedGrid(grid, startPoint, Direction.North);
+  let direction: Direction = 0;
+
+  // Determind direction of loop
+  for (let i = 0; i < 4; i++) {
+    direction = i;
+    let loopLength = getLoopLengthInDirection(grid, startPoint, direction);
+    if (loopLength > 2) break;
+  }
+
+  grid = getMarkedGrid(grid, startPoint, direction);
 
   let innerCount = 0;
+  let oldCount = 0;
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j] == 8) {
+        continue; // It's a border, continue with next
+      }
+
       // Check north
-      let northCount = 0;
-      for (let k = 0; k < grid.length - (grid.length - i); k++) {
-        if (grid[i][k] === 8) northCount++;
+      let counts = [0, 0, 0, 0];
+      for (let k = 0; k < i; k++) {
+        if (grid[k][j] === 8) counts[0]++;
       }
       // Check south
       let southCount = 0;
       for (let k = i + 1; k < grid.length; k++) {
-        if (grid[i][k] === 8) southCount++;
+        if (grid[k][j] === 8) counts[1]++;
       }
 
       // Check west
-      let westCount = grid[i].slice(0, j).reduce((prev, num) => {
+      counts[2] = grid[i].slice(0, j).reduce((prev, num) => {
         if (num === 8) {
           return prev + 1;
         }
         return prev;
       }, 0);
       // Check east
-      let eastCount = grid[i].slice(j + 1, 0).reduce((prev, num) => {
+      counts[3] = grid[i].slice(j + 1).reduce((prev, num) => {
         if (num === 8) {
           return prev + 1;
         }
         return prev;
       }, 0);
 
+      if (i == 6 && j == 14) {
+        console.log("this one");
+      }
+
       // Decision
-      if (
-        northCount % 2 !== 0 ||
-        southCount % 2 !== 0 ||
-        westCount % 2 !== 0 ||
-        eastCount % 2 !== 0
-      ) {
+      //if((counts[0] % 2 === 0 && counts[1] % 2 === 0 )|| (counts[2] % 2 === 0 && counts[3] % 2 === 0 )) {
+      const countSum = counts.reduce((prev, value) => {
+        return prev + value;
+      }, 0);
+      if (countSum % 2 !== 0) {
+        oldCount++;
+      }
+      counts = counts.filter((value) => value % 2 !== 0);
+      if (counts.length > 0) {
         innerCount++;
+      }
+      if (i == 6 && j == 14) {
+        console.log("this one");
       }
     }
   }
