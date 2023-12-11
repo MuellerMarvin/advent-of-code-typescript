@@ -184,9 +184,9 @@
     {
       "part1": {
         "solved": false,
-        "result": null,
+        "result": "NaN",
         "attempts": [],
-        "time": null
+        "time": 24.3606
       },
       "part2": {
         "solved": false,

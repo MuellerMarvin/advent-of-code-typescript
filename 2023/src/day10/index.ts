@@ -40,19 +40,10 @@ const parseInput = (rawInput: string) => {
 
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
-  const startPoint = input.startPoint;
 
-  // All possible directions from the start-point
-  const directions = [
-    Direction.North,
-    Direction.East,
-    Direction.South,
-    Direction.West,
-  ];
+  let loop = getTheLoop(input.grid, input.startPoint);
 
-  let loops = [];
-    loops.push(getLoop(input.grid, startPoint, Direction.East));
-  return;
+  return loop.length / 2;
 };
 
 const part2 = (rawInput: string): any => {
@@ -61,14 +52,23 @@ const part2 = (rawInput: string): any => {
   return;
 };
 
-const getLoop = (
+const getTheLoop = (grid: string[][], startPoint: number[]) => {
+  // All possible directions from the start-point
+  for (let i = 0; i < 4; i++) {
+    let loop = getLoopInDirection(grid, startPoint, i);
+    if (loop.length > 0) return loop;
+  }
+  return null;
+};
+
+const getLoopInDirection = (
   grid: string[][],
   startPoint: number[],
   startDirection: Direction,
 ): number[][] | null => {
   let nowPoint = startPoint;
   let nowDirection: Direction = startDirection;
-  let pastPoints: number[][] = [];
+  let loop: number[][] = [];
 
   console.log("New Loop");
 
@@ -77,12 +77,12 @@ const getLoop = (
     if (next == null) break;
     nowPoint = next.nextPoint;
     nowDirection = next.nextDirection;
-    pastPoints.push(next.nextPoint);
+    loop.push(nowPoint);
   }
 
   const endPipe = getPipe(grid, nowPoint);
   if (endPipe == null) return null; // Failed to loop
-  if (endPipe == "S") return pastPoints; // Loop complete !
+  if (endPipe == "S") return loop; // Loop complete !
 };
 
 const getStartPoint = (grid: string[][]): number[] | null => {
@@ -118,11 +118,7 @@ const getNext = (
   });
 
   // Verify new move
-  const isMoveLegal = moveLegal(
-    grid,
-    nextPoint,
-    directionInverse[nowDirection],
-  );
+  const isMoveLegal = moveLegal(grid, nextPoint, nowDirection);
   if (!isMoveLegal) {
     return null;
   }
@@ -130,12 +126,12 @@ const getNext = (
   // Get the direction that is not the entry-direction from the pipe by filtering it's direction list
   const pipe: string = getPipe(grid, nextPoint);
   const pipeArray: Direction[] = pipeToArray[pipe];
-  const filteredDirections = pipeArray.filter((value) => value != directionInverse[nowDirection]);
+  const filteredDirections = pipeArray.filter(
+    (value) => value != directionInverse[nowDirection],
+  );
   const nextDirection: Direction = filteredDirections[0];
 
-  console.log(pipe);
-  
-  return { nextPoint, nextDirection};
+  return { nextPoint, nextDirection };
 };
 
 const moveLegal = (
