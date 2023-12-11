@@ -78,6 +78,8 @@ const part2 = (rawInput: string): any => {
     if (loopLength > 2) break;
   }
 
+  replaceStartSymbol(grid, startPoint);
+
   
   const markedGrid = getMarkedGrid([...grid], startPoint, direction);
 
@@ -282,6 +284,24 @@ const moveLegal = (
 
   return includesDirection;
 };
+
+const replaceStartSymbol = (grid: number[][], startPoint: number[]) => {
+  let directions = [];
+  for (let i = 0; i < 4; i++) {
+    if(getLoopLengthInDirection(grid, startPoint, i) > 1) {
+      directions.push(i);
+    }
+  }
+
+  for (let i = 1; i < 7; i++) {
+    const pipeArray = pipeToArray[i];
+
+    if(pipeArray.filter((value) => directions.includes(value)).length == 2) {
+      grid[startPoint[0]][startPoint[1]] = pipeSymbolToNumber[i];
+      return;
+    }
+  }
+}
 
 run({
   part1: {
