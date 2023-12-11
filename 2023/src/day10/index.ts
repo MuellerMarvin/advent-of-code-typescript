@@ -18,15 +18,15 @@ const pipeSymbolToNumber: { [symbol: string]: number } = {
   ".": 7,
 }
 
-const pipeToArray: { [pipe: string]: Direction[] } = {
-  "|": [Direction.North, Direction.South],
-  "-": [Direction.West, Direction.East],
-  L: [Direction.North, Direction.East],
-  J: [Direction.North, Direction.West],
-  "7": [Direction.South, Direction.West],
-  F: [Direction.South, Direction.East],
-  ".": [],
-  S: [Direction.North, Direction.East, Direction.South, Direction.West],
+const pipeToArray: { [pipe: number]: Direction[] } = {
+  0: [Direction.North, Direction.East, Direction.South, Direction.West],
+  1: [Direction.North, Direction.South],
+  2: [Direction.West, Direction.East],
+  3: [Direction.North, Direction.East],
+  4: [Direction.North, Direction.West],
+  5: [Direction.South, Direction.West],
+  6: [Direction.South, Direction.East],
+  7: [],
 };
 
 const directionToArray: { [direction in Direction]: number[] } = {
@@ -45,8 +45,13 @@ const directionInverse: { [direction in Direction]: Direction } = {
 
 const parseInput = (rawInput: string) => {
   const lines: string[] = rawInput.split("\n");
-  const grid = lines.map((line) => Array.from(line));
-  return { grid, startPoint: getStartPoint(grid) };
+  const stringGrid = lines.map((line) => Array.from(line));
+  const numberGrid: number[][] = stringGrid.map((line) => {
+    return line.map((value) => {
+      return pipeSymbolToNumber[value];
+    })
+  });
+  return { grid: numberGrid, startPoint: getStartPoint(numberGrid) };
 };
 
 const part1 = (rawInput: string): any => {
@@ -63,7 +68,7 @@ const part2 = (rawInput: string): any => {
   return;
 };
 
-const getTheLoopLength = (grid: string[][], startPoint: number[]) => {
+const getTheLoopLength = (grid: number[][], startPoint: number[]) => {
   // All possible directions from the start-point
   for (let i = 0; i < 4; i++) {
     let loopLength = getLoopLengthInDirection(grid, startPoint, i);
@@ -73,7 +78,7 @@ const getTheLoopLength = (grid: string[][], startPoint: number[]) => {
 };
 
 const getLoopLengthInDirection = (
-  grid: string[][],
+  grid: number[][],
   startPoint: number[],
   startDirection: Direction,
 ): number | null => {
@@ -93,14 +98,14 @@ const getLoopLengthInDirection = (
 
   const endPipe = getPipe(grid, nowPoint);
   if (endPipe == null) return null; // Failed to loop
-  if (endPipe == "S") return loopLength; // Loop complete !
+  if (endPipe == 0) return loopLength; // Loop complete !
 };
 
 const getMarkedGrid = (
-  grid: string[][],
+  grid: number[][],
   startPoint: number[],
   startDirection: Direction,
-): string[][] => {
+): number[][] => {
   let nowPoint = startPoint;
   let nowDirection: Direction = startDirection;
 
@@ -111,18 +116,18 @@ const getMarkedGrid = (
     if (next == null) break;
     nowPoint = next.nextPoint;
     nowDirection = next.nextDirection;
-    grid[nowPoint[0]][nowPoint[1]] = "X";
+    grid[nowPoint[0]][nowPoint[1]] = -1;
   }
 
   const endPipe = getPipe(grid, nowPoint);
   if (endPipe == null) return null; // Failed to loop
-  if (endPipe == "S") return grid; // Loop complete !
+  if (endPipe == 0) return grid; // Loop complete !
 };
 
-const getStartPoint = (grid: string[][]): number[] | null => {
+const getStartPoint = (grid: number[][]): number[] | null => {
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] === "S") {
+      if (grid[i][j] === 0) {
         return [i, j];
       }
     }
@@ -130,7 +135,7 @@ const getStartPoint = (grid: string[][]): number[] | null => {
   return null;
 };
 
-const getPipe = (grid: string[][], pos: number[]): string | null => {
+const getPipe = (grid: number[][], pos: number[]): number | null => {
   try {
     return grid[pos[0]][pos[1]];
   } catch {
@@ -139,7 +144,7 @@ const getPipe = (grid: string[][], pos: number[]): string | null => {
 };
 
 const getNext = (
-  grid: string[][],
+  grid: number[][],
   nowPoint: number[],
   nowDirection: Direction,
 ): {
@@ -158,7 +163,7 @@ const getNext = (
   }
 
   // Get the direction that is not the entry-direction from the pipe by filtering it's direction list
-  const pipe: string = getPipe(grid, nextPoint);
+  const pipe: number = getPipe(grid, nextPoint);
   const pipeArray: Direction[] = pipeToArray[pipe];
   const filteredDirections = pipeArray.filter(
     (value) => value != directionInverse[nowDirection],
@@ -169,7 +174,7 @@ const getNext = (
 };
 
 const moveLegal = (
-  grid: string[][],
+  grid: number[][],
   nextPos: number[],
   entryDirection: Direction,
 ): boolean => {
