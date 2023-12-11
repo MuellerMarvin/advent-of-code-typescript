@@ -48,3 +48,11 @@ export const removeStr = (input: string, remove: string[]): string => {
   });
   return input;
 }
+
+export const getColumn = <arrayType>(input:arrayType[][], columnIndex: number):arrayType[] => {
+  let output: arrayType[] = []
+  for (let i = 0; i < input.length; i++) {
+    input[i][columnIndex];
+  }
+  return output;
+}
