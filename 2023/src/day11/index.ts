@@ -24,7 +24,21 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
 
-  return;
+  const markedSpace = getMarkedSpace(input.grid);
+  const galaxies = getGalaxies(input.grid);
+
+  let distSum = 0;
+  for (let i = 0; i < galaxies.length; i++) {
+    for (let j = i + 1; j < galaxies.length; j++) {
+      distSum += getMarkedDistance(
+        galaxies[i],
+        galaxies[j],
+        markedSpace,
+        1000000,
+      );
+    }
+  }
+  return distSum;
 };
 
 const getGalaxies = (grid: string[][]): number[][] => {
@@ -79,6 +93,30 @@ const expandSpace = (inputGrid: string[][]) => {
   return grid;
 };
 
+const getMarkedSpace = (inputGrid: string[][]) => {
+  // Deep copy to preverse input-grid
+  let grid: string[][] = inputGrid.map((line) => line.map((char) => char));
+
+  // Mark lines
+  inputGrid.forEach((line, lineIndex) => {
+    if (line.every((value) => value !== "#")) {
+      grid[lineIndex] = new Array(line.length).fill("X");
+    }
+  });
+
+  // Mark columns
+  for (let columnIndex = 0; columnIndex < grid[0].length; columnIndex++) {
+    const column = getColumn(inputGrid, columnIndex);
+    if (column.every((value) => value !== "#")) {
+      for(let lineIndex = 0; lineIndex < grid.length; lineIndex++) {
+        grid[lineIndex][columnIndex] = 'X';
+      }
+    }
+  }
+
+  return grid;
+};
+
 const getDistance = (a: number[], b: number[]) => {
   let lineDistance = Math.max(a[0], b[0]) - Math.min(a[0], b[0]);
   let columnDistance = Math.max(a[1], b[1]) - Math.min(a[1], b[1]);
@@ -90,7 +128,7 @@ const getMarkedDistance = (
   b: number[],
   grid: string[][],
   expansion: number,
-) => {
+): number => {
   let distance = 0;
 
   let lowerLine = Math.min(a[0], b[0]);
@@ -109,13 +147,14 @@ const getMarkedDistance = (
 
   const column = getColumn(grid, higherColumn).slice(lowerLine, higherLine);
   column.forEach((char) => {
-    if(char === '.' || char === '#') {
+    if (char === "." || char === "#") {
       distance++;
-    }
-    else {
+    } else {
       distance += expansion;
     }
   });
+
+  return distance;
 };
 
 run({
@@ -130,10 +169,10 @@ run({
   },
   part2: {
     tests: [
-      // {
-      //   input: ``,
-      //   expected: "",
-      // },
+      {
+        input: `...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#.....`,
+        expected: "",
+      },
     ],
     solution: part2,
   },
