@@ -52,7 +52,7 @@ export const removeStr = (input: string, remove: string[]): string => {
 export const getColumn = <arrayType>(input:arrayType[][], columnIndex: number):arrayType[] => {
   let output: arrayType[] = []
   for (let i = 0; i < input.length; i++) {
-    input[i][columnIndex];
+    output.push(input[i][columnIndex]);
   }
   return output;
 }

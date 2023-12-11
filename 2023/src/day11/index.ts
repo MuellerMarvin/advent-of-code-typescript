@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { getColumn } from "../utils/index.js";
 
 const parseInput = (rawInput: string) => {
   const lines: string[] = rawInput.split("\n");
@@ -50,7 +51,20 @@ const expandSpace = (inputGrid: string[][]) => {
   //#endregion Expand Lines
 
   //#region Expand Columns
+  let emptyColumns: number[] = [];
+  for (let i = 0; i < grid[0].length; i++) {
+    if(getColumn(grid, i).every((value) => value === '.')) {
+      emptyColumns.push(i);
+    }
+  }
 
+  for (let index = 0; index < emptyColumns.length; index++) {
+    // Fill one element into each line at the index of the empty colunmn
+    for (let line = 0; line < grid.length; line++) {
+      grid[line].splice(emptyColumns[index], 0, '.');
+      
+    }
+  }
   //#endregion Expand Columns
 
   return grid;
