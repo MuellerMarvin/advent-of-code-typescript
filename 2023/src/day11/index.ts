@@ -3,7 +3,7 @@ import { getColumn } from "../utils/index.js";
 
 const parseInput = (rawInput: string) => {
   const lines: string[] = rawInput.split("\n");
-  const grid: string[][] = lines.map((line) => Array.from(line))
+  const grid: string[][] = lines.map((line) => Array.from(line));
   return { grid };
 };
 
@@ -61,7 +61,7 @@ const expandSpace = (inputGrid: string[][]) => {
   //#region Expand Columns
   let emptyColumns: number[] = [];
   for (let i = 0; i < grid[0].length; i++) {
-    const column = getColumn(grid, i)
+    const column = getColumn(grid, i);
     if (column.every((value) => value === ".")) {
       emptyColumns.push(i);
     }
@@ -83,6 +83,39 @@ const getDistance = (a: number[], b: number[]) => {
   let lineDistance = Math.max(a[0], b[0]) - Math.min(a[0], b[0]);
   let columnDistance = Math.max(a[1], b[1]) - Math.min(a[1], b[1]);
   return lineDistance + columnDistance;
+};
+
+const getMarkedDistance = (
+  a: number[],
+  b: number[],
+  grid: string[][],
+  expansion: number,
+) => {
+  let distance = 0;
+
+  let lowerLine = Math.min(a[0], b[0]);
+  let higherLine = Math.max(a[0], b[0]);
+  let lowerColumn = Math.min(a[1], b[1]);
+  let higherColumn = Math.max(a[1], b[1]);
+
+  const line = grid[higherLine].slice(lowerColumn, higherColumn);
+  line.forEach((char) => {
+    if (char === "#" || char === ".") {
+      distance++;
+    } else {
+      distance += expansion;
+    }
+  });
+
+  const column = getColumn(grid, higherColumn).slice(lowerLine, higherLine);
+  column.forEach((char) => {
+    if(char === '.' || char === '#') {
+      distance++;
+    }
+    else {
+      distance += expansion;
+    }
+  });
 };
 
 run({
