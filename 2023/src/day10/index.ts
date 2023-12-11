@@ -106,7 +106,8 @@ const part2 = (rawInput: string): any => {
 
       let counts = [0, 0];
       let verticalPattern: RegExp = /-|7\|*L|F\|*J/g;
-      let horizontalPattern: RegExp = /\||L\-*7|F\-*J/g
+      let horizontalPattern: RegExp = /\||L\-*7|F\-*J/g;
+
       // Check north
       let set = [];
       for (let k = 0; k < i; k++) {
@@ -117,10 +118,10 @@ const part2 = (rawInput: string): any => {
       let setString = set.join("");
       let matchResult = setString.match(verticalPattern);
       if (matchResult !== null) counts[0] = matchResult.length;
-      
+
       // Check west
-      matchResult = markedGrid[i].slice(0, j).join('').match(horizontalPattern);
-      if(matchResult !== null) counts[1] = matchResult.length;
+      matchResult = markedGrid[i].slice(0, j).join("").match(horizontalPattern);
+      if (matchResult !== null) counts[1] = matchResult.length;
       const countSum = counts.reduce((prev, value) => {
         return prev + value;
       }, 0);
