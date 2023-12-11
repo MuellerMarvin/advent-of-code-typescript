@@ -65,72 +65,80 @@ const part1 = (rawInput: string): any => {
 };
 
 const part2 = (rawInput: string): any => {
-  let grid = parseInput(rawInput).grid;
-  const startPoint = getStartPoint(grid);
+  const input = parseInput(rawInput);
+  const grid = input.grid;
+  const startPoint = input.startPoint;
 
   let direction: Direction = 0;
 
-  // Determind direction of loop
+  // Determine direction of loop
   for (let i = 0; i < 4; i++) {
     direction = i;
     let loopLength = getLoopLengthInDirection(grid, startPoint, direction);
     if (loopLength > 2) break;
   }
 
-  grid = getMarkedGrid(grid, startPoint, direction);
+  
+  const markedGrid = getMarkedGrid([...grid], startPoint, direction);
 
   let innerCount = 0;
   let oldCount = 0;
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] == 8) {
+  for (let i = 0; i < markedGrid.length; i++) {
+    for (let j = 0; j < markedGrid[i].length; j++) {
+      if (markedGrid[i][j] == 8) {
         continue; // It's a border, continue with next
       }
 
-      // Check north
       let counts = [0, 0, 0, 0];
-      for (let k = 0; k < i; k++) {
-        if (grid[k][j] === 8) counts[0]++;
+      let verticalSet: number[] = ["-", "L", "J"].map(
+        (value) => pipeSymbolToNumber[value],
+      );
+      let horizontalSet: number[] = ["|", "J", "7"].map(
+        (value) => pipeSymbolToNumber[value],
+      );
+      // Check north
+      for (let k = i + 1; k < markedGrid.length; k++) {
+        if (markedGrid[k][j] === 8 && verticalSet.includes(grid[k][j])) {
+          counts[0]++;
+        }
       }
       // Check south
       let southCount = 0;
-      for (let k = i + 1; k < grid.length; k++) {
-        if (grid[k][j] === 8) counts[1]++;
+      for (let k = i + 1; k < markedGrid.length; k++) {
+        if (markedGrid[k][j] === 8 && verticalSet.includes(grid[k][j])) {
+          counts[1]++;
+        }
       }
 
       // Check west
-      counts[2] = grid[i].slice(0, j).reduce((prev, num) => {
-        if (num === 8) {
-          return prev + 1;
-        }
-        return prev;
-      }, 0);
+      counts[2] = markedGrid[i]
+        .slice(0, j)
+        .filter((value) => horizontalSet.includes(value))
+        .reduce((prev, num) => {
+          if (num === 8) {
+            return prev + 1;
+          }
+          return prev;
+        }, 0);
       // Check east
-      counts[3] = grid[i].slice(j + 1).reduce((prev, num) => {
-        if (num === 8) {
-          return prev + 1;
-        }
-        return prev;
-      }, 0);
-
-      if (i == 6 && j == 14) {
-        console.log("this one");
-      }
+      counts[3] = markedGrid[i]
+        .slice(j + 1)
+        .filter((value) => horizontalSet.includes(value))
+        .reduce((prev, num) => {
+          if (num === 8) {
+            return prev + 1;
+          }
+          return prev;
+        }, 0);
 
       // Decision
       //if((counts[0] % 2 === 0 && counts[1] % 2 === 0 )|| (counts[2] % 2 === 0 && counts[3] % 2 === 0 )) {
       const countSum = counts.reduce((prev, value) => {
         return prev + value;
       }, 0);
-      if (countSum % 2 !== 0) {
-        oldCount++;
-      }
-      counts = counts.filter((value) => value % 2 !== 0);
-      if (counts.length > 0) {
+
+      if (counts.filter(value => value % 2 !== 0).length > 0) {
         innerCount++;
-      }
-      if (i == 6 && j == 14) {
-        console.log("this one");
       }
     }
   }
@@ -174,7 +182,7 @@ const getLoopLengthInDirection = (
 };
 
 const getMarkedGrid = (
-  grid: number[][],
+  inputGrid: number[][],
   startPoint: number[],
   startDirection: Direction,
 ): number[][] | null => {
@@ -182,6 +190,14 @@ const getMarkedGrid = (
   let nowDirection: Direction = startDirection;
 
   console.log("Marking Loop");
+  // clone array so you don't modify the input
+  let grid = [];
+  for (let i = 0; i < inputGrid.length; i++) {
+    grid.push([]);
+    for (let j = 0; j < inputGrid[i].length; j++) {
+      grid[i].push(inputGrid[i][j]);
+    }
+  }
 
   while (true) {
     let next = getNext(grid, nowPoint, nowDirection);
