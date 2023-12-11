@@ -191,7 +191,7 @@
       "part2": {
         "solved": false,
         "result": "15068",
-        "attempts": [],
+        "attempts": ["15068"],
         "time": 35.1996
       }
     },
