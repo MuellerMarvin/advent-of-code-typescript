@@ -7,6 +7,17 @@ enum Direction {
   West = 3,
 }
 
+const pipeSymbolToNumber: { [symbol: string]: number } = {
+  S: 0,
+  "|": 1,
+  "-": 2,
+  L: 3,
+  J: 4,
+  "7": 5,
+  F: 6,
+  ".": 7,
+}
+
 const pipeToArray: { [pipe: string]: Direction[] } = {
   "|": [Direction.North, Direction.South],
   "-": [Direction.West, Direction.East],
@@ -41,9 +52,9 @@ const parseInput = (rawInput: string) => {
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
 
-  let loop = getTheLoop(input.grid, input.startPoint);
+  let loopLength = getTheLoopLength(input.grid, input.startPoint);
 
-  return loop.length / 2;
+  return loopLength / 2;
 };
 
 const part2 = (rawInput: string): any => {
@@ -52,23 +63,23 @@ const part2 = (rawInput: string): any => {
   return;
 };
 
-const getTheLoop = (grid: string[][], startPoint: number[]) => {
+const getTheLoopLength = (grid: string[][], startPoint: number[]) => {
   // All possible directions from the start-point
   for (let i = 0; i < 4; i++) {
-    let loop = getLoopInDirection(grid, startPoint, i);
-    if (loop.length > 0) return loop;
+    let loopLength = getLoopLengthInDirection(grid, startPoint, i);
+    if (loopLength > 0) return loopLength;
   }
   return null;
 };
 
-const getLoopInDirection = (
+const getLoopLengthInDirection = (
   grid: string[][],
   startPoint: number[],
   startDirection: Direction,
-): number[][] | null => {
+): number | null => {
   let nowPoint = startPoint;
   let nowDirection: Direction = startDirection;
-  let loop: number[][] = [];
+  let loopLength = 0;
 
   console.log("New Loop");
 
@@ -77,15 +88,19 @@ const getLoopInDirection = (
     if (next == null) break;
     nowPoint = next.nextPoint;
     nowDirection = next.nextDirection;
-    loop.push(nowPoint);
+    loopLength++;
   }
 
   const endPipe = getPipe(grid, nowPoint);
   if (endPipe == null) return null; // Failed to loop
-  if (endPipe == "S") return loop; // Loop complete !
+  if (endPipe == "S") return loopLength; // Loop complete !
 };
 
-const getMarkedGrid = (grid: string[][], startPoint: number[], startDirection: Direction): string[][] => {
+const getMarkedGrid = (
+  grid: string[][],
+  startPoint: number[],
+  startDirection: Direction,
+): string[][] => {
   let nowPoint = startPoint;
   let nowDirection: Direction = startDirection;
 
@@ -96,13 +111,13 @@ const getMarkedGrid = (grid: string[][], startPoint: number[], startDirection: D
     if (next == null) break;
     nowPoint = next.nextPoint;
     nowDirection = next.nextDirection;
-    grid[nowPoint[0]][nowPoint[1]] = 'X';
+    grid[nowPoint[0]][nowPoint[1]] = "X";
   }
 
   const endPipe = getPipe(grid, nowPoint);
   if (endPipe == null) return null; // Failed to loop
   if (endPipe == "S") return grid; // Loop complete !
-}
+};
 
 const getStartPoint = (grid: string[][]): number[] | null => {
   for (let i = 0; i < grid.length; i++) {
