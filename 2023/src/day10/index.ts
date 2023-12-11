@@ -85,6 +85,25 @@ const getLoopInDirection = (
   if (endPipe == "S") return loop; // Loop complete !
 };
 
+const getMarkedGrid = (grid: string[][], startPoint: number[], startDirection: Direction): string[][] => {
+  let nowPoint = startPoint;
+  let nowDirection: Direction = startDirection;
+
+  console.log("Marking Loop");
+
+  while (true) {
+    let next = getNext(grid, nowPoint, nowDirection);
+    if (next == null) break;
+    nowPoint = next.nextPoint;
+    nowDirection = next.nextDirection;
+    grid[nowPoint[0]][nowPoint[1]] = 'X';
+  }
+
+  const endPipe = getPipe(grid, nowPoint);
+  if (endPipe == null) return null; // Failed to loop
+  if (endPipe == "S") return grid; // Loop complete !
+}
+
 const getStartPoint = (grid: string[][]): number[] | null => {
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
