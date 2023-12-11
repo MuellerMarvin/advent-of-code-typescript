@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { match } from "assert";
 import { stat } from "fs";
 
 enum Direction {
@@ -17,6 +18,17 @@ const pipeSymbolToNumber: { [symbol: string]: number } = {
   "7": 5,
   F: 6,
   ".": 7,
+};
+
+const numberToPipeSymbol: { [number: number]: string } = {
+  0: "S",
+  1: "|",
+  2: "-",
+  3: "L",
+  4: "J",
+  5: "7",
+  6: "F",
+  7: ".",
 };
 
 const pipeToArray: { [pipe: number]: Direction[] } = {
@@ -78,10 +90,11 @@ const part2 = (rawInput: string): any => {
     if (loopLength > 2) break;
   }
 
-  replaceStartSymbol(grid, startPoint);
-
-  
   const markedGrid = getMarkedGrid([...grid], startPoint, direction);
+  grid[startPoint[0]][startPoint[1]] = getStartReplacementSymbol(
+    grid,
+    startPoint,
+  );
 
   let innerCount = 0;
   let oldCount = 0;
@@ -91,55 +104,28 @@ const part2 = (rawInput: string): any => {
         continue; // It's a border, continue with next
       }
 
-      let counts = [0, 0, 0, 0];
-      let verticalSet: number[] = ["-", "L", "J"].map(
-        (value) => pipeSymbolToNumber[value],
-      );
-      let horizontalSet: number[] = ["|", "J", "7"].map(
-        (value) => pipeSymbolToNumber[value],
-      );
+      let counts = [0, 0];
+      let verticalPattern: RegExp = /-|7\|*L|F\|*J/g;
+      let horizontalPattern: RegExp = /\||L\-*7|F\-*J/g
       // Check north
-      for (let k = i + 1; k < markedGrid.length; k++) {
-        if (markedGrid[k][j] === 8 && verticalSet.includes(grid[k][j])) {
-          counts[0]++;
+      let set = [];
+      for (let k = 0; k < i; k++) {
+        if (markedGrid[k][j] === 8) {
+          set.push(numberToPipeSymbol[grid[k][j]]);
         }
       }
-      // Check south
-      let southCount = 0;
-      for (let k = i + 1; k < markedGrid.length; k++) {
-        if (markedGrid[k][j] === 8 && verticalSet.includes(grid[k][j])) {
-          counts[1]++;
-        }
-      }
-
+      let setString = set.join("");
+      let matchResult = setString.match(verticalPattern);
+      if (matchResult !== null) counts[0] = matchResult.length;
+      
       // Check west
-      counts[2] = markedGrid[i]
-        .slice(0, j)
-        .filter((value) => horizontalSet.includes(value))
-        .reduce((prev, num) => {
-          if (num === 8) {
-            return prev + 1;
-          }
-          return prev;
-        }, 0);
-      // Check east
-      counts[3] = markedGrid[i]
-        .slice(j + 1)
-        .filter((value) => horizontalSet.includes(value))
-        .reduce((prev, num) => {
-          if (num === 8) {
-            return prev + 1;
-          }
-          return prev;
-        }, 0);
-
-      // Decision
-      //if((counts[0] % 2 === 0 && counts[1] % 2 === 0 )|| (counts[2] % 2 === 0 && counts[3] % 2 === 0 )) {
+      matchResult = markedGrid[i].slice(0, j).join('').match(horizontalPattern);
+      if(matchResult !== null) counts[1] = matchResult.length;
       const countSum = counts.reduce((prev, value) => {
         return prev + value;
       }, 0);
 
-      if (counts.filter(value => value % 2 !== 0).length > 0) {
+      if (counts.filter((value) => value % 2 !== 0).length > 0) {
         innerCount++;
       }
     }
@@ -285,10 +271,13 @@ const moveLegal = (
   return includesDirection;
 };
 
-const replaceStartSymbol = (grid: number[][], startPoint: number[]) => {
+const getStartReplacementSymbol = (
+  grid: number[][],
+  startPoint: number[],
+): number => {
   let directions = [];
   for (let i = 0; i < 4; i++) {
-    if(getLoopLengthInDirection(grid, startPoint, i) > 1) {
+    if (getLoopLengthInDirection(grid, startPoint, i) > 1) {
       directions.push(i);
     }
   }
@@ -296,12 +285,12 @@ const replaceStartSymbol = (grid: number[][], startPoint: number[]) => {
   for (let i = 1; i < 7; i++) {
     const pipeArray = pipeToArray[i];
 
-    if(pipeArray.filter((value) => directions.includes(value)).length == 2) {
-      grid[startPoint[0]][startPoint[1]] = pipeSymbolToNumber[i];
-      return;
+    if (pipeArray.filter((value) => directions.includes(value)).length == 2) {
+      return i;
     }
   }
-}
+  return undefined;
+};
 
 run({
   part1: {
