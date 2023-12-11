@@ -16,7 +16,7 @@ const pipeSymbolToNumber: { [symbol: string]: number } = {
   "7": 5,
   F: 6,
   ".": 7,
-}
+};
 
 const pipeToArray: { [pipe: number]: Direction[] } = {
   0: [Direction.North, Direction.East, Direction.South, Direction.West],
@@ -27,6 +27,7 @@ const pipeToArray: { [pipe: number]: Direction[] } = {
   5: [Direction.South, Direction.West],
   6: [Direction.South, Direction.East],
   7: [],
+  8: [],
 };
 
 const directionToArray: { [direction in Direction]: number[] } = {
@@ -49,7 +50,7 @@ const parseInput = (rawInput: string) => {
   const numberGrid: number[][] = stringGrid.map((line) => {
     return line.map((value) => {
       return pipeSymbolToNumber[value];
-    })
+    });
   });
   return { grid: numberGrid, startPoint: getStartPoint(numberGrid) };
 };
@@ -63,9 +64,52 @@ const part1 = (rawInput: string): any => {
 };
 
 const part2 = (rawInput: string): any => {
-  const input = parseInput(rawInput);
+  let grid = parseInput(rawInput).grid;
+  const startPoint = getStartPoint(grid);
 
-  return;
+  grid = getMarkedGrid(grid, startPoint, Direction.North);
+
+  let innerCount = 0;
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      // Check north
+      let northCount = 0;
+      for (let k = 0; k < grid.length - (grid.length - i); k++) {
+        if (grid[i][k] === 8) northCount++;
+      }
+      // Check south
+      let southCount = 0;
+      for (let k = i + 1; k < grid.length; k++) {
+        if (grid[i][k] === 8) southCount++;
+      }
+
+      // Check west
+      let westCount = grid[i].slice(0, j).reduce((prev, num) => {
+        if (num === 8) {
+          return prev + 1;
+        }
+        return prev;
+      }, 0);
+      // Check east
+      let eastCount = grid[i].slice(j + 1, 0).reduce((prev, num) => {
+        if (num === 8) {
+          return prev + 1;
+        }
+        return prev;
+      }, 0);
+
+      // Decision
+      if (
+        northCount % 2 !== 0 ||
+        southCount % 2 !== 0 ||
+        westCount % 2 !== 0 ||
+        eastCount % 2 !== 0
+      ) {
+        innerCount++;
+      }
+    }
+  }
+  return innerCount;
 };
 
 const getTheLoopLength = (grid: number[][], startPoint: number[]) => {
@@ -90,22 +134,25 @@ const getLoopLengthInDirection = (
 
   while (true) {
     let next = getNext(grid, nowPoint, nowDirection);
-    if (next == null) break;
+    if (next === null) break;
     nowPoint = next.nextPoint;
     nowDirection = next.nextDirection;
     loopLength++;
+    if (loopLength > 20000) {
+      return null;
+    }
   }
 
   const endPipe = getPipe(grid, nowPoint);
-  if (endPipe == null) return null; // Failed to loop
-  if (endPipe == 0) return loopLength; // Loop complete !
+  if (endPipe === null) return null; // Failed to loop
+  if (endPipe === 0) return loopLength; // Loop complete !
 };
 
 const getMarkedGrid = (
   grid: number[][],
   startPoint: number[],
   startDirection: Direction,
-): number[][] => {
+): number[][] | null => {
   let nowPoint = startPoint;
   let nowDirection: Direction = startDirection;
 
@@ -113,15 +160,17 @@ const getMarkedGrid = (
 
   while (true) {
     let next = getNext(grid, nowPoint, nowDirection);
-    if (next == null) break;
+    if (next === null) break;
     nowPoint = next.nextPoint;
     nowDirection = next.nextDirection;
-    grid[nowPoint[0]][nowPoint[1]] = -1;
+    grid[nowPoint[0]][nowPoint[1]] = 8;
   }
 
   const endPipe = getPipe(grid, nowPoint);
-  if (endPipe == null) return null; // Failed to loop
-  if (endPipe == 0) return grid; // Loop complete !
+  if (endPipe === null) return null; // Failed to loop
+  if (endPipe === 8) {
+    return grid;
+  } // Loop complete !
 };
 
 const getStartPoint = (grid: number[][]): number[] | null => {
@@ -180,11 +229,14 @@ const moveLegal = (
 ): boolean => {
   // Checks if pipe is in grid
   const pipe = getPipe(grid, nextPos);
-  if (pipe == null) return false;
+  if (pipe === null) return false;
 
   // Checks if direction is legal
   const inverseDirection = directionInverse[entryDirection];
   const pipeArray: Direction[] = pipeToArray[pipe];
+  if (pipeArray === undefined) {
+    return false;
+  }
   const includesDirection = pipeArray.includes(inverseDirection);
 
   return includesDirection;

@@ -184,15 +184,15 @@
     {
       "part1": {
         "solved": false,
-        "result": "NaN",
+        "result": "6697",
         "attempts": [],
-        "time": 24.3606
+        "time": 20.6927
       },
       "part2": {
         "solved": false,
-        "result": null,
+        "result": "15068",
         "attempts": [],
-        "time": null
+        "time": 36.398
       }
     },
     {
