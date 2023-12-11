@@ -184,20 +184,20 @@
     {
       "part1": {
         "solved": true,
-        "result": "70",
+        "result": "6697",
         "attempts": [],
-        "time": 2.0248
+        "time": 18.3726
       },
       "part2": {
-        "solved": false,
-        "result": "8",
+        "solved": true,
+        "result": "423",
         "attempts": [
           "15068",
           "15324",
           "444",
           "433"
         ],
-        "time": 2.0006
+        "time": 40.4041
       }
     },
     {

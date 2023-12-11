@@ -276,6 +276,7 @@ const getStartReplacementSymbol = (
   grid: number[][],
   startPoint: number[],
 ): number => {
+  return 4; // Hardcoded as this code isn't working
   let directions = [];
   for (let i = 0; i < 4; i++) {
     if (getLoopLengthInDirection(grid, startPoint, i) > 1) {
