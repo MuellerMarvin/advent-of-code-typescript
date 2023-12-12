@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { validateHeaderName } from "http";
 
 const parseInput = (rawInput: string) => {
   const lines: string[] = rawInput.split("\n");
@@ -55,21 +56,65 @@ const part2 = (rawInput: string): any => {
     return [...count, ...count, ...count, ...count, ...count];
   });
 
-  const combinationCounts = templates.map((template, index) => {
-    const combinations = getGenerallyValidConfigs(
-      template.length,
-      counts[index],
-    ).filter((combination) => {
-      return isValidForBlanks(combination, template);
-    });
+  const combinationCountsPromise = Promise.all(
+    templates.map((template, index) =>
+      getValidCombinationCount(template, counts[index], index),
+    ),
+  );
 
-    return combinations.length;
+  combinationCountsPromise.then((combinationCounts) => {
+    const count = combinationCounts.reduce((prev, acc) => {
+      return prev + acc;
+    }, 0);
+    return count;
   });
-
-  return combinationCounts.reduce((prev, acc) => {
-    return prev + acc;
-  }, 0);
 };
+
+const getValidCombinationCount = async (
+  template: number[],
+  counts: number[], id: number
+): Promise<number> => {
+  const wildcardCount = template.filter((value) => value == -1).length;
+  const comboGen = combinationGenerator(wildcardCount);
+  let comboCount = 0;
+
+  for(let combination of comboGen) {
+    let tempCounts = getCountsOfLine(fillWildcards(template, combination));
+    if(counts.every((value, index) => {
+      return tempCounts[index] == value;
+    })) {
+      comboCount++;
+    }
+  }
+  console.log("Done " + id)
+  return comboCount;
+};
+
+const fillWildcards = (template: number[], fillers: number[]): number[] => {
+  const copyTemplate = template.map((value) => value);
+  let filled = 0;
+  for (let i = 0; i < copyTemplate.length; i++) {
+    if(copyTemplate[i] === -1) {
+      copyTemplate[i] = fillers[filled];
+      filled++;
+    }
+  }
+  return template;
+}
+
+function* combinationGenerator(length: number): Generator<number[]> {
+  const totalCombinations = Math.pow(2, length);
+  const combinations: number[][] = [];
+
+  for (let i = 0; i < totalCombinations; i++) {
+      const combo: number[] = [];
+      for (let j = 0; j < length; j++) {
+          // Shift and mask to get the bit at position j
+          combo.push((i >> j) & 1);
+      }
+      yield(combo)
+  }
+}
 
 const isValidForBlanks = (
   combination: number[],
@@ -149,7 +194,7 @@ const generateCombinations = (length: number): number[][] => {
   return result.map((combination) =>
     combination.split("").map((value) => parseInt(value)),
   );
-}
+};
 
 run({
   part1: {
