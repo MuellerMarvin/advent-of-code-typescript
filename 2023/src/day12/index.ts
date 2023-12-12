@@ -133,7 +133,7 @@ const getCountsOfLine = (line: number[]) => {
   return counts;
 };
 
-const generateCombinations(length: number): number[][] => {
+const generateCombinations = (length: number): number[][] => {
   const result: string[] = [];
 
   function generate(current: string) {
