@@ -236,12 +236,12 @@
     },
     {
       "part1": {
-        "solved": false,
-        "result": "30338",
+        "solved": true,
+        "result": "32371",
         "attempts": [
           "30338"
         ],
-        "time": 1.3423
+        "time": 2.173
       },
       "part2": {
         "solved": false,

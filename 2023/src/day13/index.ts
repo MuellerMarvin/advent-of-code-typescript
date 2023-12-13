@@ -37,8 +37,7 @@ const part2 = (rawInput: string): any => {
 };
 
 const findHorizontalReflection = (pattern: string[]): number => {
-  for (let line = 3; line < pattern.length; line++) {
-    // TODO: Change to line = 0
+  for (let line = 0; line < pattern.length; line++) {
     const a = pattern.slice(0, line + 1).reverse();
     const b = pattern.slice(line + 1);
     const partsSame = partsAreSame(a, b);
@@ -73,10 +72,14 @@ const partsAreSame = (partA: string[], partB: string[]): boolean => {
 run({
   part1: {
     tests: [
+      // {
+      //   input: `#.##..##.\n..#.##.#.\n##......#\n##......#\n..#.##.#.\n..##..##.\n#.#.##.#.\n\n#...##..#\n#....#..#\n..##..###\n#####.##.\n#####.##.\n..##..###\n#....#..#`,
+      //   expected: 405,
+      // },
       {
-        input: `#.##..##.\n..#.##.#.\n##......#\n##......#\n..#.##.#.\n..##..##.\n#.#.##.#.\n\n#...##..#\n#....#..#\n..##..###\n#####.##.\n#####.##.\n..##..###\n#....#..#`,
-        expected: 405,
-      },
+        input: `....#..#.\n###.##.#.\n###..##..\n##.......\n..##.##.#\n##.......\n##..#..#.\n....####.\n###..##..\n##.......\n....#..#.\n....#..#.\n..##....#`,
+        expected: 69
+      }
     ],
     solution: part1,
   },
