@@ -56,3 +56,12 @@ export const getColumn = <arrayType>(input:arrayType[][], columnIndex: number):a
   }
   return output;
 }
+
+
+export const getColumnReversed = <arrayType>(input:arrayType[][], columnIndex: number):arrayType[] => {
+  let output: arrayType[] = []
+  for (let i = (input.length - 1); i >= 0; i--) {
+    output.push(input[i][columnIndex]);
+  }
+  return output;
+}
