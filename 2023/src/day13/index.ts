@@ -69,6 +69,10 @@ const partsAreSame = (partA: string[], partB: string[]): boolean => {
   return true;
 };
 
+const findSmudge = (pattern: string[]) => {
+  
+}
+
 run({
   part1: {
     tests: [
