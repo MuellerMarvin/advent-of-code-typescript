@@ -33,7 +33,22 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const patterns = parseInput(rawInput);
 
-  return;
+  const horizontals = patterns
+    .map((pattern) => {
+      return findHorizontalSmudge(pattern);
+    })
+    .filter((value) => value > -1);
+
+  const verticals: number[] = patterns
+    .map((pattern) => {
+      return findHorizontalSmudge(pattern);
+    })
+    .filter((value) => value > -1);
+
+  const horizontalCount = horizontals.reduce((prev, acc) => prev + acc + 1, 0);
+  const verticalCount = verticals.reduce((prev, acc) => prev + acc + 1, 0);
+
+  return verticalCount + horizontalCount * 100;
 };
 
 const findHorizontalReflection = (pattern: string[]): number => {
@@ -69,6 +84,39 @@ const partsAreSame = (partA: string[], partB: string[]): boolean => {
   return true;
 };
 
+const findVerticalSmudge = (pattern: string[]): number => {
+  let sideWaysPattern = [];
+  let segmentedPattern = pattern.map((line) => line.split(""));
+
+  for (let column = 0; column < pattern[0].length; column++) {
+    sideWaysPattern.push(getColumn(segmentedPattern, column));
+  }
+
+  return findHorizontalSmudge(sideWaysPattern.map((line) => line.join("")));
+};
+
+const findHorizontalSmudge = (pattern: string[]): number => {
+  for (let i = 0; i < pattern.length; i++) {
+    for (let j = 0; j < pattern[i].length; j++) {
+      let attemptPattern: string[] = pattern;
+      if (attemptPattern[i].at(j) == "#") {
+        attemptPattern[i] = replaceAt(attemptPattern[i], ".", j);
+      } else {
+        attemptPattern[i] = replaceAt(attemptPattern[i], "#", j);
+      }
+      if (findHorizontalReflection(attemptPattern) > -1) {
+        // TODO: Could be done in a variable to save execution time
+        return findHorizontalReflection(attemptPattern);
+      }
+    }
+  }
+  return -1;
+};
+
+const replaceAt = (input: string, character: string, pos: number) => {
+  return input.substring(0, pos) + character + input.substring(pos + 1);
+};
+
 run({
   part1: {
     tests: [
@@ -78,8 +126,8 @@ run({
       // },
       {
         input: `....#..#.\n###.##.#.\n###..##..\n##.......\n..##.##.#\n##.......\n##..#..#.\n....####.\n###..##..\n##.......\n....#..#.\n....#..#.\n..##....#`,
-        expected: 69
-      }
+        expected: 69,
+      },
     ],
     solution: part1,
   },
