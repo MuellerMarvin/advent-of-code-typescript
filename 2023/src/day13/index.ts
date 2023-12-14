@@ -96,16 +96,18 @@ const findVerticalSmudge = (pattern: string[]): number => {
 };
 
 const findHorizontalSmudge = (pattern: string[]): number => {
+  const skipReflection = findHorizontalReflection(pattern);
+
   for (let i = 0; i < pattern.length; i++) {
     for (let j = 0; j < pattern[i].length; j++) {
-      let attemptPattern: string[] = pattern;
+      let attemptPattern: string[] = pattern.map((line) => line);
       if (attemptPattern[i].at(j) == "#") {
         attemptPattern[i] = replaceAt(attemptPattern[i], ".", j);
       } else {
         attemptPattern[i] = replaceAt(attemptPattern[i], "#", j);
       }
-      if (findHorizontalReflection(attemptPattern) > -1) {
-        // TODO: Could be done in a variable to save execution time
+      const reflection = findHorizontalReflection(attemptPattern);
+      if (reflection > -1 && reflection !== skipReflection) {
         return findHorizontalReflection(attemptPattern);
       }
     }
@@ -129,10 +131,10 @@ run({
   },
   part2: {
     tests: [
-      // {
-      //   input: ``,
-      //   expected: "",
-      // },
+      {
+        input: `#.##..##.\n..#.##.#.\n##......#\n##......#\n..#.##.#.\n..##..##.\n#.#.##.#.\n\n#...##..#\n#....#..#\n..##..###\n#####.##.\n#####.##.\n..##..###\n#....#..#`,
+        expected: 400,
+      },
     ],
     solution: part2,
   },
