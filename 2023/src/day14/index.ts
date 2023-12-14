@@ -1,4 +1,5 @@
 import run from "aocrunner";
+import { createHash } from "crypto";
 import { getColumn, getColumnReversed } from "../utils/index.js";
 
 const parseInput = (rawInput: string) => {
@@ -37,10 +38,9 @@ const part2 = (rawInput: string) => {
 
 const findRepeatingCycle = (
   lines: string[][],
-): { currentIndex: number; pastIndex: number, pastLoads: number[] } | null => {
-  let pastLoads = [getLoad(lines)];
-  let pastCycles = [makeCopy(lines)];
+): { currentIndex: number; pastIndex: number; pastLoads: number[] } | null => {
   let cycleCount: number = 0;
+  let pastHashes = [getHash(lines)];
 
   while (cycleCount < 1_000_000_000) {
     // Run Cycle
@@ -48,8 +48,12 @@ const findRepeatingCycle = (
     cycleCount++;
 
     // Compare Load
-    let currentLoad = getLoad(lines);
-    // find cyclic
+    let currentHash = getHash(lines);
+    // find cyclical appearance
+    if(pastHashes.includes(currentHash)) {
+      break;
+    }
+    pastHashes.push(currentHash);
   }
   return null;
 };
@@ -67,6 +71,12 @@ const getLoad = (input: string[][]) => {
     });
   });
   return count;
+};
+
+const getHash = (input: string[][]) => {
+  return createHash("sha256")
+    .update((input.map((line) => line.join("")).join('')))
+    .digest("hex");
 };
 
 const cycleEqual = (cycleA: string[][], cycleB: string[][]) => {
