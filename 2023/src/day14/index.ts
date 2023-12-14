@@ -30,15 +30,21 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const input = parseInput(rawInput);
   let lines = input;
-  if(lines.length > 100) return;
+  if (lines.length > 100) return;
 
   let lastCycle = lines;
   for (let cycle = 0; cycle < 1000000000; cycle++) {
     lines = runCycle(lines);
-    if(lines.every((line, lineIndex) =>  line.every((char, charIndex) => char === lastCycle[lineIndex][charIndex]))) {
+    if (
+      lines.every((line, lineIndex) =>
+        line.every(
+          (char, charIndex) => char === lastCycle[lineIndex][charIndex],
+        ),
+      )
+    ) {
       break;
     }
-    lastCycle = makeCopy(lines);;
+    lastCycle = makeCopy(lines);
   }
 
   lines = lines.reverse();
@@ -56,7 +62,7 @@ const part2 = (rawInput: string): any => {
 
 const makeCopy = (lines: string[][]): string[][] => {
   return lines.map((line) => line.map((char) => char));
-}
+};
 
 const runCycle = (lines: string[][]): string[][] => {
   for (let spins = 0; spins < 4; spins++) {
