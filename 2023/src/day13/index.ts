@@ -33,15 +33,14 @@ const part1 = (rawInput: string): any => {
 const part2 = (rawInput: string): any => {
   const patterns = parseInput(rawInput);
 
-  const unfilteredHorizontals = patterns
-    .map((pattern) => {
-      return findHorizontalSmudge(pattern);
-    });
+  const unfilteredHorizontals = patterns.map((pattern) => {
+    return findHorizontalSmudge(pattern);
+  });
   const horizontals = unfilteredHorizontals.filter((value) => value > -1);
 
   const verticals: number[] = patterns
     .map((pattern, patternIndex) => {
-      if(unfilteredHorizontals[patternIndex] > -1) {
+      if (unfilteredHorizontals[patternIndex] > -1) {
         return -1;
       }
       return findHorizontalSmudge(pattern);
