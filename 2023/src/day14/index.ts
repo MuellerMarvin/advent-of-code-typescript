@@ -27,26 +27,36 @@ const part1 = (rawInput: string): any => {
   return count;
 };
 
-const part2 = (rawInput: string): any => {
+const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
   let lines = input;
-  if (lines.length > 100) return;
+  let data = findRepeatingCycle(lines);
 
-  let lastCycle = lines;
-  for (let cycle = 0; cycle < 1000000000; cycle++) {
+  return;
+};
+
+const findRepeatingCycle = (
+  lines: string[][],
+): { currentIndex: number; pastIndex: number, pastLoads: number[] } | null => {
+  let pastLoads = [getLoad(lines)];
+  let pastCycles = [makeCopy(lines)];
+  let cycleCount: number = 0;
+
+  while (cycleCount < 1_000_000_000) {
+    // Run Cycle
     lines = runCycle(lines);
-    if (
-      lines.every((line, lineIndex) =>
-        line.every(
-          (char, charIndex) => char === lastCycle[lineIndex][charIndex],
-        ),
-      )
-    ) {
-      break;
-    }
-    lastCycle = makeCopy(lines);
-  }
+    cycleCount++;
 
+    // Compare Load
+    let currentLoad = getLoad(lines);
+    // find cyclic
+  }
+  return null;
+};
+
+const getLoad = (input: string[][]) => {
+  let lines = makeCopy(input);
+  // Count
   lines = lines.reverse();
   let count = 0;
   lines.forEach((line, lineIndex) => {
@@ -56,8 +66,15 @@ const part2 = (rawInput: string): any => {
       }
     });
   });
-
   return count;
+};
+
+const cycleEqual = (cycleA: string[][], cycleB: string[][]) => {
+  return cycleA.every((line, lineIndex) => {
+    return line.every((char, charIndex) => {
+      return char === cycleB[lineIndex][charIndex];
+    });
+  });
 };
 
 const makeCopy = (lines: string[][]): string[][] => {
