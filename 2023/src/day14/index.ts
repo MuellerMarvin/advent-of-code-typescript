@@ -33,12 +33,19 @@ const part2 = (rawInput: string) => {
   let lines = input;
   let data = findRepeatingCycle(lines);
 
-  return;
+  let remaining = 1_000_000_000 % ((data.pastIndex + 1) + ((data.currentIndex + 1) - (data.pastIndex + 1)));
+  lines = data.lastGrid;
+
+  for (let index = 0; index < remaining; index++) {
+    lines = runCycle(lines);
+  }
+
+  return getLoad(lines);
 };
 
 const findRepeatingCycle = (
   lines: string[][],
-): { currentIndex: number; pastIndex: number; pastLoads: number[] } | null => {
+): { currentIndex: number; pastIndex: number; pastHashes: string[], lastGrid: string[][] } | null => {
   let cycleCount: number = 0;
   let pastHashes = [getHash(lines)];
 
@@ -46,16 +53,28 @@ const findRepeatingCycle = (
     // Run Cycle
     lines = runCycle(lines);
     cycleCount++;
+    //console.log(`Cycle: ${cycleCount} | Load: ${getLoad(lines)} | Hash: ${getHash(lines)}`);
 
     // Compare Load
     let currentHash = getHash(lines);
     // find cyclical appearance
-    if(pastHashes.includes(currentHash)) {
-      break;
+    if (pastHashes.includes(currentHash)) {
+      return {
+        currentIndex: cycleCount,
+        pastIndex: pastHashes.findIndex((value) => value == currentHash),
+        pastHashes: pastHashes,
+        lastGrid: lines,
+       };
     }
     pastHashes.push(currentHash);
   }
   return null;
+};
+
+const getHash = (input: string[][]) => {
+  return createHash("sha256")
+    .update(input.map((line) => line.join("")).join(""))
+    .digest("hex");
 };
 
 const getLoad = (input: string[][]) => {
@@ -71,12 +90,6 @@ const getLoad = (input: string[][]) => {
     });
   });
   return count;
-};
-
-const getHash = (input: string[][]) => {
-  return createHash("sha256")
-    .update((input.map((line) => line.join("")).join('')))
-    .digest("hex");
 };
 
 const cycleEqual = (cycleA: string[][], cycleB: string[][]) => {
