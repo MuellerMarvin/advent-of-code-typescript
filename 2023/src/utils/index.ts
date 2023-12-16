@@ -65,3 +65,31 @@ export const getColumnReversed = <arrayType>(input:arrayType[][], columnIndex: n
   }
   return output;
 }
+
+/**
+ * Returns a two dimensional array with the callback function applied to each element
+ * @param arrayA Array for elementA
+ * @param arrayB Array for elementB
+ * @param callback The function applied to each element pair
+ */
+export const dualMap = <Type>(
+  arrayA: Type[][],
+  arrayB: Type[][],
+  callback: (elementA: Type, elementB: Type) => Type,
+): Type[][] => {
+  return arrayA.map((line, lineIndex) =>
+    line.map((element, elementIndex) =>
+      callback(element, arrayB[lineIndex][elementIndex]),
+    ),
+  );
+};
+
+export const createGrid = <Type>(x: number, y: number, startValue: Type):Type[][]  => {
+  let array: Type[][] = new Array(x);
+
+  for (let i = 0; i < x; i++) {
+    array[i] = new Array(y).fill(startValue);
+  }
+
+  return array;
+};
