@@ -19,6 +19,10 @@ type Beam = {
   direction: Direction;
 };
 
+const compareBeams = (beamA: Beam, beamB: Beam) => {
+  return (beamA.direction === beamB.direction && beamA.origin[0] == beamB.origin[0] && beamA.origin[1] == beamB.origin[1]);
+}
+
 const part1 = (rawInput: string): any => {
   const input = parseInput(rawInput);
   const grid = input.map((line) => line.split(""));
@@ -32,9 +36,10 @@ const part1 = (rawInput: string): any => {
 
     let beamResult: BeamResult = fireBeam(beam, grid);
     let nextBeams = beamResult.nextBeams.filter((nextBeam) => {
-      return (beamArchive.filter((oldBeam) => (oldBeam.origin[0] == nextBeam.origin[0] && oldBeam.origin[1] == nextBeam.origin[1] && oldBeam.direction == nextBeam.direction)).length > 0);
+      return beamArchive.every((beam) => !compareBeams(beam, nextBeam));
     });
     beams = beams.concat(nextBeams);
+    beamArchive = beamArchive.concat(nextBeams);
     energized = dualMap(energized, beamResult.energized, (a, b) => a + b);
   }
 
